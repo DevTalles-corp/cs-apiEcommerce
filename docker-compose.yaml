@@ -14,6 +14,6 @@ volumes:
   sqlserverdata:
 # Comandos útiles:
 # Levantar los contenedores en segundo plano:
-#   docker-compose up -d
+#  docker-compose up -d
 # Apagar y eliminar contenedores (no borra los volúmenes):
-#   docker-compose down
+#  docker-compose down
