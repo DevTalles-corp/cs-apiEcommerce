@@ -1,4 +1,3 @@
-using System;
 using ApiEcommerce.Repository.IRepository;
 
 namespace ApiEcommerce.Repository;
