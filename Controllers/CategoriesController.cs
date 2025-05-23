@@ -72,5 +72,36 @@ namespace ApiEcommerce.Controllers
       }
       return CreatedAtRoute("GetCategory", new { id = category.Id }, category);
     }
+
+    [HttpPatch("{id:int}", Name = "UpdateCategory")]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult UpdateCategory(int id, [FromBody] CreateCategoryDto updateCategoryDto)
+    {
+      if (!_categoryRepository.CategoryExists(id))
+      {
+        return NotFound($"La categoría con el id {id} no existe");
+      }
+      if (updateCategoryDto == null)
+      {
+        return BadRequest(ModelState);
+      }
+      if (_categoryRepository.CategoryExists(updateCategoryDto.Name))
+      {
+        ModelState.AddModelError("CustomError", "La categoría ya existe");
+        return BadRequest(ModelState);
+      }
+      var category = _mapper.Map<Category>(updateCategoryDto);
+      category.Id = id;
+      if (!_categoryRepository.UpdateCategory(category))
+      {
+        ModelState.AddModelError("CustomError", $"Algo salió mal al actualizar el registro {category.Name}");
+        return StatusCode(500, ModelState);
+      }
+      return NoContent();
+    }
   }
 }
