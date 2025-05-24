@@ -3,6 +3,7 @@ using ApiEcommerce.Repository.IRepository;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 
 namespace ApiEcommerce.Controllers
 {
@@ -99,6 +100,32 @@ namespace ApiEcommerce.Controllers
       if (!_categoryRepository.UpdateCategory(category))
       {
         ModelState.AddModelError("CustomError", $"Algo salió mal al actualizar el registro {category.Name}");
+        return StatusCode(500, ModelState);
+      }
+      return NoContent();
+    }
+
+    [HttpDelete("{id:int}", Name = "DeleteCategory")]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult DeleteCategory(int id)
+    {
+      if (!_categoryRepository.CategoryExists(id))
+      {
+        return NotFound($"La categoría con el id {id} no existe");
+      }
+      var category = _categoryRepository.GetCategory(id);
+      if (category == null)
+      {
+        return NotFound($"La categoría con el id {id} no existe");
+      }
+
+      if (!_categoryRepository.DeleteCategory(category))
+      {
+        ModelState.AddModelError("CustomError", $"Algo salió mal al eliminar el registro {category.Name}");
         return StatusCode(500, ModelState);
       }
       return NoContent();
