@@ -27,5 +27,21 @@ namespace ApiEcommerce.Controllers
       var usersDto = _mapper.Map<List<UserDto>>(users);
       return Ok(usersDto);
     }
+
+    [HttpGet("{id:int}", Name = "GetUser")]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult GetUser(int id)
+    {
+      var user = _userRepository.GetUser(id);
+      if (user == null)
+      {
+        return NotFound($"El usuario con el id {id} no existe");
+      }
+      var userDto = _mapper.Map<UserDto>(user);
+      return Ok(userDto);
+    }
   }
 }
