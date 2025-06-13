@@ -1,5 +1,3 @@
-using System;
-
 namespace ApiEcommerce.Constants;
 
 public static class PolicyNames
