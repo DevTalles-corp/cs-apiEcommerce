@@ -50,14 +50,8 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddControllers(option =>
 {
-  option.CacheProfiles.Add("Default10", new CacheProfile()
-  {
-    Duration = 10
-  });
-  option.CacheProfiles.Add("Default20", new CacheProfile()
-  {
-    Duration = 20
-  });
+  option.CacheProfiles.Add(CacheProfiles.Default10, CacheProfiles.Profile10);
+  option.CacheProfiles.Add(CacheProfiles.Default20, CacheProfiles.Profile20);
 }
 );
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
