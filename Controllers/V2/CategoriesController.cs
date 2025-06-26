@@ -9,10 +9,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 
-namespace ApiEcommerce.Controllers
+namespace ApiEcommerce.Controllers.V2
 {
   [Route("api/v{version:apiVersion}/[controller]")]
-  [ApiVersion("1.0")]
   [ApiVersion("2.0")]
   [ApiController]
   [Authorize(Roles = "Admin")]
@@ -31,24 +30,6 @@ namespace ApiEcommerce.Controllers
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [MapToApiVersion("1.0")]
-    // [EnableCors(PolicyNames.AllowSpecificOrigin)]
-    public IActionResult GetCategories()
-    {
-      var categories = _categoryRepository.GetCategories();
-      var categoriesDto = new List<CategoryDto>();
-      foreach (var category in categories)
-      {
-        categoriesDto.Add(_mapper.Map<CategoryDto>(category));
-      }
-      return Ok(categoriesDto);
-    }
-
-    [AllowAnonymous]
-    [HttpGet]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [MapToApiVersion("2.0")]
     // [EnableCors(PolicyNames.AllowSpecificOrigin)]
     public IActionResult GetCategoriesOrderById()
     {
