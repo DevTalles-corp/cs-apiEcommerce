@@ -87,6 +87,23 @@ builder.Services.AddSwaggerGen(
         new List<string>()
       }
     });
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+      Version = "v1",
+      Title = "API Ecommerce",
+      Description = "API para gestionar productos y usuarios",
+      TermsOfService = new Uri("http://example.com/terms"),
+      Contact = new OpenApiContact
+      {
+        Name = "DevTalles",
+        Url = new Uri("https://devtalles.com")
+      },
+      License = new OpenApiLicense
+      {
+        Name = "Licencia de uso",
+        Url = new Uri("http://example.com/license")
+      }
+    });
   }
 );
 var apiVersioningBuilder = builder.Services.AddApiVersioning(option =>
@@ -94,7 +111,7 @@ var apiVersioningBuilder = builder.Services.AddApiVersioning(option =>
   option.AssumeDefaultVersionWhenUnspecified = true;
   option.DefaultApiVersion = new ApiVersion(1, 0);
   option.ReportApiVersions = true;
-  option.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader("api-version")); //?api-version
+  // option.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader("api-version")); //?api-version
 });
 apiVersioningBuilder.AddApiExplorer(option =>
 {
@@ -118,7 +135,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
   app.UseSwagger();
-  app.UseSwaggerUI();
+  app.UseSwaggerUI(options =>
+  {
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+  });
 }
 
 app.UseHttpsRedirection();
