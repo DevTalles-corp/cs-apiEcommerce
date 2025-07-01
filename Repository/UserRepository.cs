@@ -147,6 +147,7 @@ public class UserRepository : IUserRepository
       var createdUser = _db.ApplicationUsers.FirstOrDefault(u => u.UserName == createUserDto.Username);
       return _mapper.Map<UserDataDto>(createdUser);
     }
-    throw new ApplicationException("No se pudo realizar el registro");
+    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+    throw new ApplicationException($"No se pudo realizar el registro: {errors}");
   }
 }
