@@ -59,7 +59,7 @@ namespace ApiEcommerce.Controllers
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult CreateProduct([FromBody] CreateProductDto createProductDto)
+    public IActionResult CreateProduct([FromForm] CreateProductDto createProductDto)
     {
       if (createProductDto == null)
       {
@@ -76,7 +76,7 @@ namespace ApiEcommerce.Controllers
         return BadRequest(ModelState);
       }
       var product = _mapper.Map<Product>(createProductDto);
-      // Agregango imagen
+      // Agregando imagen
       if (createProductDto.Image != null)
       {
         string fileName = product.ProductId + Guid.NewGuid().ToString() + Path.GetExtension(createProductDto.Image.FileName);
@@ -174,7 +174,7 @@ namespace ApiEcommerce.Controllers
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult UpdateProduct(int productId, [FromBody] UpdateProductDto updateProductDto)
+    public IActionResult UpdateProduct(int productId, [FromForm] UpdateProductDto updateProductDto)
     {
       if (updateProductDto == null)
       {
@@ -192,6 +192,31 @@ namespace ApiEcommerce.Controllers
       }
       var product = _mapper.Map<Product>(updateProductDto);
       product.ProductId = productId;
+      // Agregando imagen
+      if (updateProductDto.Image != null)
+      {
+        string fileName = product.ProductId + Guid.NewGuid().ToString() + Path.GetExtension(updateProductDto.Image.FileName);
+        var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductsImages");
+        if (!Directory.Exists(imagesFolder))
+        {
+          Directory.CreateDirectory(imagesFolder);
+        }
+        var filePath = Path.Combine(imagesFolder, fileName);
+        FileInfo file = new FileInfo(filePath);
+        if (file.Exists)
+        {
+          file.Delete();
+        }
+        using var fileStream = new FileStream(filePath, FileMode.Create);
+        updateProductDto.Image.CopyTo(fileStream);
+        var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+        product.ImgUrl = $"{baseUrl}/ProductsImages/{fileName}";
+        product.ImgUrlLocal = filePath;
+      }
+      else
+      {
+        product.ImgUrl = "https://placehold.co/300x300";
+      }
       if (!_productRepository.UpdateProduct(product))
       {
         ModelState.AddModelError("CustomError", $"Algo salió mal al actualizar el registro {product.Name}");
