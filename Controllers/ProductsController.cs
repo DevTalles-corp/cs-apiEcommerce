@@ -76,6 +76,31 @@ namespace ApiEcommerce.Controllers
         return BadRequest(ModelState);
       }
       var product = _mapper.Map<Product>(createProductDto);
+      // Agregango imagen
+      if (createProductDto.Image != null)
+      {
+        string fileName = product.ProductId + Guid.NewGuid().ToString() + Path.GetExtension(createProductDto.Image.FileName);
+        var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductsImages");
+        if (!Directory.Exists(imagesFolder))
+        {
+          Directory.CreateDirectory(imagesFolder);
+        }
+        var filePath = Path.Combine(imagesFolder, fileName);
+        FileInfo file = new FileInfo(filePath);
+        if (file.Exists)
+        {
+          file.Delete();
+        }
+        using var fileStream = new FileStream(filePath, FileMode.Create);
+        createProductDto.Image.CopyTo(fileStream);
+        var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+        product.ImgUrl = $"{baseUrl}/ProductsImages/{fileName}";
+        product.ImgUrlLocal = filePath;
+      }
+      else
+      {
+        product.ImgUrl = "https://placehold.co/300x300";
+      }
       if (!_productRepository.CreateProduct(product))
       {
         ModelState.AddModelError("CustomError", $"Algo salió mal al guardar el registro {product.Name}");
